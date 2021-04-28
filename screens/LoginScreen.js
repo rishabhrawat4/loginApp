@@ -10,7 +10,7 @@ import Feather from 'react-native-vector-icons/Feather';
 
 const LoginScreen = ({navigation}) => {
     
-
+    const { sendPushNotification } = React.useContext(AuthContext)
     const [data, setData] = React.useState({
         username: '',
         password: '',
@@ -71,13 +71,12 @@ const LoginScreen = ({navigation}) => {
             Alert.alert('Invalid User!', 'Username or password is incorrect.', [
                 {text: 'Okay'}
             ]);
-            console.log('Invalid User!', 'Username or password is incorrect.');
             return;
         }
-        /*Alert.alert('Logged In', 'User successfully login', [
-            {text: 'Okay'}
-        ]);*/
-        console.log(foundUser[0].userToken)
+        // Alert.alert('Logged In', 'User successfully login', [
+        //     {text: 'Okay'}
+        // ]);
+        sendPushNotification("Login Status", "Successfully logged in");
         signIn(username, password, foundUser[0].userToken);
     }
 
@@ -108,7 +107,8 @@ const LoginScreen = ({navigation}) => {
         <View style={styles.container}>
             <StatusBar backgroundColor="#009387" barStyle="light-content" />
             <View style={styles.header}>
-                <Text style={styles.text_header}>LogIn</Text>
+                <Text style={[styles.text_header, {fontSize: 16, marginBottom: 5, color: 'rgba(255, 255, 255, 0.7)'}]}>Welcome!</Text>
+                <Text style={styles.text_header}>Sign In</Text>
             </View>
             <Animatable.View 
                 animation="fadeInUpBig"
@@ -120,13 +120,13 @@ const LoginScreen = ({navigation}) => {
                     color: colors.text
                 }]}>Username</Text>
                 <View style={styles.action}>
-                    <FontAwesome 
+                    {/* <FontAwesome 
                         name="user-o"
                         color={colors.text}
                         size={20}
-                    />
+                    /> */}
                     <TextInput 
-                        placeholder="Your Username"
+                        placeholder="Enter Username"
                         placeholderTextColor="#666666"
                         style={[styles.textInput, {
                             color: colors.text
@@ -158,13 +158,13 @@ const LoginScreen = ({navigation}) => {
                      marginTop: 35
                     }]}>Password</Text>
                 <View style={styles.action}>
-                    <Feather 
+                    {/* <Feather 
                         name="lock"
                         color={colors.text}
                         size={20}
-                    />
+                    /> */}
                      <TextInput 
-                        placeholder="Your Password"
+                        placeholder="Enter Password"
                         placeholderTextColor="#666666"
                         secureTextEntry={data.secureTextEntry ? true : false}
                         style={[styles.textInput, {
@@ -197,7 +197,7 @@ const LoginScreen = ({navigation}) => {
                 </Animatable.View>
                 }
                 <TouchableOpacity>
-                        <Text style={{color: '#009387', marginTop:15}}>Forgot password?</Text>
+                        <Text style={{color: '#009387', marginTop:15, textAlign: 'center'}}>Forgot password ?</Text>
                 </TouchableOpacity>
                 <View>
                     <TouchableOpacity
@@ -215,7 +215,7 @@ const LoginScreen = ({navigation}) => {
                                 }]}>Sign In</Text>
                             </LinearGradient>
                         </TouchableOpacity>
-                        <TouchableOpacity
+                        {/* <TouchableOpacity
                             onPress={() => navigation.navigate('Register')}
                             style={[styles.signIn, {
                                 borderColor: '#009387',
@@ -226,7 +226,15 @@ const LoginScreen = ({navigation}) => {
                             <Text style={[styles.textSign, {
                                 color: '#009387'
                             }]}>Sign Up</Text>
-                        </TouchableOpacity>
+                        </TouchableOpacity> */}
+                </View>
+                <View style={styles.signUpBox}>
+                    <Text style={styles.signUpHeading}>Don't have an account |</Text>
+                    <TouchableOpacity
+                        onPress={() => navigation.navigate('Register')} 
+                    >
+                            <Text style={styles.signUp}>Sign Up</Text>
+                    </TouchableOpacity>
                 </View>
             </Animatable.View>
         </View>
@@ -245,12 +253,13 @@ const styles = StyleSheet.create({
         paddingBottom: 50
     },
     footer: {
-        flex: 3,
+        flex: 4,
         backgroundColor: '#fff',
         borderTopLeftRadius: 30,
         borderTopRightRadius: 30,
         paddingHorizontal: 20,
-        paddingVertical: 30
+        paddingVertical: 40,
+        paddingHorizontal: 40
     },
     text_header: {
         color: '#fff',
@@ -259,12 +268,14 @@ const styles = StyleSheet.create({
     },
     text_footer: {
         color: '#05375a',
-        fontSize: 18
+        fontSize: 14,
+        marginBottom: 10,
+        fontFamily: "Roboto"
     },
     action: {
         flexDirection: 'row',
         marginTop: 10,
-        borderBottomWidth: 1,
+        borderBottomWidth: 2,
         borderBottomColor: '#f2f2f2',
         paddingBottom: 5
     },
@@ -277,9 +288,11 @@ const styles = StyleSheet.create({
     },
     textInput: {
         flex: 1,
-        marginTop: -12,
-        paddingLeft: 10,
+        marginTop: 0,
+        paddingLeft: 0,
         color: '#05375a',
+        fontSize: 16,
+        fontFamily: "Roboto"
     },
     errorMsg: {
         color: '#FF0000',
@@ -294,10 +307,27 @@ const styles = StyleSheet.create({
         height: 50,
         justifyContent: 'center',
         alignItems: 'center',
-        borderRadius: 10
+        borderRadius: 10,
+        marginTop: 10
     },
     textSign: {
         fontSize: 18,
+        fontWeight: 'bold'
+    },
+    signUpBox: {
+        marginTop: 20,
+        flexDirection: 'row',
+        justifyContent: 'center',
+        paddingVertical: 2,
+    },
+    signUpHeading: {
+        textAlign: 'center',
+        color: '#05375a',
+    },
+    signUp: {
+        textAlign: 'center',
+        paddingHorizontal: 2,
+        color: '#009387',
         fontWeight: 'bold'
     }
   });

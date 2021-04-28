@@ -10,10 +10,9 @@ const window = Dimensions.get("window");
 
 const HomeScreen = ({ navigation }) => {
     const { signOut } = React.useContext(AuthContext);
-    const { getUsername, changeFullname, changeUsername, changeEmail } = React.useContext(AuthContext);
+    const { getUsername, changeFullname, changeUsername, changeEmail, sendPushNotification } = React.useContext(AuthContext);
     const item = getUsername();
     const { colors } = useTheme();
-    console.log(item)
 
     const fullnameRef = useRef(null);
     const UsernameRef = useRef(null);
@@ -74,27 +73,30 @@ const HomeScreen = ({ navigation }) => {
     const updateFullname = () => {
         const user = changeFullname(data.fullname);
         updateFullnameChanged();
-        console.log(user)
     }
 
     const updateUsername = () => {
         const user = changeUsername(data.username);
         updateUsernameChanged();
-        console.log(user)
     }
 
     const updateEmail = () => {
         const user = changeEmail(data.email);
         updateEmailChanged();
-        console.log(user)
     }
+
     return (
         <View style={styles.container}>
             <View style={styles.headerContainer}>
             <StatusBar backgroundColor="#009387" barStyle="light-content" />
-            <Image 
+            {item.image ? 
+                <Image 
                 style={styles.tinyPhoto}
                 source={{ uri: item.image.uri }} />
+                :
+                null
+            }
+            
             <View style={styles.header}>
                 <Text style={styles.text_header}>Hi {item.fullname} </Text>
             </View>
@@ -107,6 +109,7 @@ const HomeScreen = ({ navigation }) => {
                     backgroundColor: colors.background
                 }]}
             >
+                
                 <View style={styles.action}>
                     <Text style={styles.text_footer}>Fullname: </Text>
                     { data.isFullnameChange ?

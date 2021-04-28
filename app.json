@@ -2,7 +2,7 @@
   "expo": {
     "name": "Login-App",
     "version": "1.0.0",
-    "slug": "logonApp",
+    "slug": "loginApp",
     "sdkVersion": "40.0.0",
     "android": {
       "package": "com.log.log0",

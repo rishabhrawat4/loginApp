@@ -1,19 +1,29 @@
-import { createStackNavigator } from '@react-navigation/stack';
+import { createStackNavigator, HeaderBackButton } from '@react-navigation/stack';
 import { NavigationContainer } from '@react-navigation/native';
 import * as React from 'react';
 import HomeScreen from './screens/HomeScreen';
 import LoginScreen from './screens/LoginScreen';
 import RegisterScreen from './screens/RegisterScreen';
-import { useState } from 'react';
-import { View, ActivityIndicator, Text } from 'react-native';
-import { useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { View, ActivityIndicator, Text, LogBox, AsyncStorage } from 'react-native';
 import AuthContext from './components/context';
-import AsyncStorage from '@react-native-community/async-storage';
 import Users from './models/Users';
+import sendPushNotification from './models/sendPushNotifications';
+import registerForPushNotificationsAsync from './models/registerForPushNotificationsAsync';
+import * as Notifications from 'expo-notifications';
+
+LogBox.ignoreLogs(['Remote debugger']);
+
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: false,
+    shouldSetBadge: false,
+  }),
+});
 
 
 const Stack = createStackNavigator();
-
 const MyStack = () => {
 
   /*const [isLoading, setIsLoading ] = React.useState(true);
@@ -24,6 +34,10 @@ const MyStack = () => {
     userToken: null,
   };
 
+  const [expoPushToken, setExpoPushToken] = useState('');
+  const [notification, setNotification] = useState(false);
+  const notificationListener = useRef();
+  const responseListener = useRef();
 
   const loginReducer = (prevState, action) => {
     switch( action.type ) {
@@ -61,11 +75,9 @@ const MyStack = () => {
 
   const authContext = React.useMemo(() => ({
     signIn: async (username, password, userToken) => {
-      console.log(userToken);
       try{
         await AsyncStorage.setItem('userToken', userToken);
       } catch(e){
-        console.log(e);
       }
       dispatch({ type: 'LOGIN', id: 'user', token: userToken})
     },
@@ -73,7 +85,6 @@ const MyStack = () => {
       try{
         await AsyncStorage.removeItem('userToken');
       } catch(e){
-        console.log(e);
       }
       dispatch({ type: 'LOGOUT' })
     },
@@ -89,11 +100,9 @@ const MyStack = () => {
         image: image
       }
       Users.push(user);
-      console.log(user);
       try {
         await AsyncStorage.setItem('userToken', userToken);
       } catch(e){
-        console.log(e);
       }
       dispatch({ type: 'REGISTER', id: 'user', token: userToken})
     },
@@ -109,7 +118,6 @@ const MyStack = () => {
     changeFullname: (fullname) => {
       for(var i = 0; i < Users.length; i++)
       {
-        console.log('here')
         if(Users[i]['userToken'] == loginState.userToken)
         {
           Users[i]['fullname'] = fullname;
@@ -122,7 +130,6 @@ const MyStack = () => {
     changeUsername: (username) => {
       for(var i = 0; i < Users.length; i++)
       {
-        console.log('here')
         if(Users[i]['userToken'] == loginState.userToken)
         {
           Users[i]['username'] = username;
@@ -135,7 +142,6 @@ const MyStack = () => {
     changeEmail: (email) => {
       for(var i = 0; i < Users.length; i++)
       {
-        console.log('here')
         if(Users[i]['userToken'] == loginState.userToken)
         {
           Users[i]['email'] = email;
@@ -144,6 +150,9 @@ const MyStack = () => {
         }
       }
       return {};
+    },
+    sendPushNotification: async(messageTitle, messageBody) => {
+      await sendPushNotification(expoPushToken, messageTitle, messageBody);
     }
   }));
 
@@ -153,10 +162,23 @@ const MyStack = () => {
       try{
         userToken = await AsyncStorage.getItem('userToken')
       } catch(e){
-        console.log(e);
       }
       dispatch({ type: 'RETRIEVE_TOKEN', token: userToken})
     }, 1000);
+    registerForPushNotificationsAsync().then(token => setExpoPushToken(token));
+
+    notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
+      setNotification(notification);
+    });
+
+    responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
+        
+    });
+
+    return () => {
+      Notifications.removeNotificationSubscription(notificationListener.current);
+      Notifications.removeNotificationSubscription(responseListener.current);
+    };
   }, []);
 
   if(loginState.isLoading){
@@ -176,8 +198,29 @@ const MyStack = () => {
     </Stack.Navigator>
     :
     <Stack.Navigator>
-      <Stack.Screen name="Login" component={LoginScreen} />
-      <Stack.Screen name="Register" component={RegisterScreen} />
+      <Stack.Screen 
+        name="Sign In" 
+        component={LoginScreen}
+        options={{
+          headerTitle: "",
+          headerStyle: {
+            backgroundColor: '#009387',
+            elevation: 0
+          }
+        }}
+      />
+      <Stack.Screen 
+        name="Register" 
+        component={RegisterScreen}
+        options={{
+          headerTitle: "",
+          headerStyle: {
+            backgroundColor: '#009387',
+            elevation: 0,
+          },
+          headerTintColor: '#fff' 
+        }}
+      />
     </Stack.Navigator>
     }
     </AuthContext.Provider>
